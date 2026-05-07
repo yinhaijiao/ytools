@@ -20,6 +20,12 @@
         <activity
             android:name=".MediaPickerActivity"
             android:exported="false" />
+        <activity
+            android:name=".ConvertedFilesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ImageViewerActivity"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"

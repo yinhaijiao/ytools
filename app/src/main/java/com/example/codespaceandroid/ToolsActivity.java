@@ -20,11 +20,12 @@ import android.widget.Toast;
 public class ToolsActivity extends Activity {
     private static final int REQUEST_WRITE_STORAGE = 1002;
     private String pendingDestinationFolder = "012";
+    private boolean pendingConvertedFiles;
 
     private static final String[] FEATURE_BUTTONS = {
         "工具1",
         "工具2",
-        "文件工具",
+        "工具3",
         "设置"
     };
 
@@ -50,6 +51,8 @@ public class ToolsActivity extends Activity {
                 button.setOnClickListener(v -> openMediaTool("012"));
             } else if ("工具2".equals(label)) {
                 button.setOnClickListener(v -> openMediaTool("013"));
+            } else if ("工具3".equals(label)) {
+                button.setOnClickListener(v -> openConvertedFiles());
             }
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -68,6 +71,7 @@ public class ToolsActivity extends Activity {
     }
 
     private void openMediaTool(String destinationFolder) {
+        pendingConvertedFiles = false;
         pendingDestinationFolder = destinationFolder;
         if (!hasRootStorageAccess()) {
             requestRootStorageAccess();
@@ -109,6 +113,15 @@ public class ToolsActivity extends Activity {
         startActivity(intent);
     }
 
+    private void openConvertedFiles() {
+        if (!hasRootStorageAccess()) {
+            pendingConvertedFiles = true;
+            requestRootStorageAccess();
+            return;
+        }
+        startActivity(new Intent(this, ConvertedFilesActivity.class));
+    }
+
     @Override
     public void onRequestPermissionsResult(
             int requestCode,
@@ -119,6 +132,11 @@ public class ToolsActivity extends Activity {
         if (requestCode == REQUEST_WRITE_STORAGE
                 && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (pendingConvertedFiles) {
+                pendingConvertedFiles = false;
+                startActivity(new Intent(this, ConvertedFilesActivity.class));
+                return;
+            }
             openMediaPicker(pendingDestinationFolder);
         }
     }
